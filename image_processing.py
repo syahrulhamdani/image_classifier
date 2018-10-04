@@ -95,11 +95,11 @@ def process_image(image):
     top, bottom = (im.height - 224)/2, (im.height + 224)/2
     im = im.crop([left, top, right, bottom])
     np_im = np.array(im)
-    np_im[:, :, 0] = (np_im[:, :, 0] - np_im[:, :, 0].mean())
-    / np_im[:, :, 0].std()
-    np_im[:, :, 1] = (np_im[:, :, 1] - np_im[:, :, 1].mean())
-    / np_im[:, :, 1].std()
-    np_im[:, :, 2] = (np_im[:, :, 2] - np_im[:, :, 2].mean())
-    / np_im[:, :, 2].std()
+    np_im[:, :, 0] = (np_im[:, :, 0] - np_im[:, :, 0].mean()) / ...
+    np_im[:, :, 0].std()
+    np_im[:, :, 1] = (np_im[:, :, 1] - np_im[:, :, 1].mean()) / ...
+    np_im[:, :, 1].std()
+    np_im[:, :, 2] = (np_im[:, :, 2] - np_im[:, :, 2].mean()) / ...
+    np_im[:, :, 2].std()
 
     return np_im.transpose()
