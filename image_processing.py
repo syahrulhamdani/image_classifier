@@ -6,37 +6,62 @@ import torch
 from torchvision import datasets, transforms
 
 
-def process_data(datapath, transformation, batch_sizes=[64, 32, 32],
+def process_data(datapath, batch_sizes=[64, 32, 32],
                  shuffles=[True, False, False]):
     """
     load data to train the model.
 
     parameters
     ----------
-    datapath: str path to dataset;
-        This function expect 3 subfolders inside root folder of the data
-        `train` `valid` and `test`.
-    transformation: list of dict or nested dict;
-        a dictionary comprises all image transformation for each `train`,
-        `valid`, and `test` with the same key names
+    datapath: str path to dataset.
+                This function expect 3 subfolders inside root folder of the
+                data `train` `valid` and `test`.
+    batch_sizes: list of int. batch size for each of data loading from dataset
+    shuffles: list of boolean. whether shuffle or not when loading the dataset,
+                passed into DataLoader.
 
     returns
     -------
-    image_dataset: dict of ImageFolder dataloaders: DataLoader
+    image_dataset: dict of ImageFolder
+    dataloaders: DataLoader
     """
     train_dir = os.path.join(datapath, 'train')
     valid_dir = os.path.join(datapath, 'valid')
     test_dir = os.path.join(datapath, 'test')
 
+    data_transforms = {'train': transforms.Compose([
+                                    transforms.Resize(256),
+                                    transforms.RandomHorizontalFlip(0.3),
+                                    transforms.RandomRotation(30),
+                                    transforms.RandomResizedCrop(224),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize([.485, .456, .406],
+                                                         [.229, .224, .225])
+                                ]),
+                       'valid': transforms.Compose([
+                                    transforms.Resize(256),
+                                    transforms.CenterCrop(224),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize([.485, .456, .406],
+                                                         [.229, .224, .225])
+                                ]),
+                       'test': transforms.Compose([
+                                    transforms.Resize(256),
+                                    transforms.CenterCrop(224),
+                                    transforms.ToTensor(),
+                                    transforms.Normalize([.485, .456, .406],
+                                                         [.229, .224, .225])
+                               ])}
+
     image_dataset = {
         'train': datasets.ImageFolder(
-            train_dir, transform=transformation['train']
+            train_dir, transform=data_transforms['train']
         ),
         'valid': datasets.ImageFolder(
-            valid_dir, transform=transformation['valid']
+            valid_dir, transform=data_transforms['valid']
         ),
         'test': datasets.ImageFolder(
-            test_dir, transform=transformation['test']
+            test_dir, transform=data_transforms['test']
         )
     }
 
