@@ -1,9 +1,10 @@
 import argparse
 import sys
+import os
 import torch
 import torch.optim as optim
 import torch.nn as nn
-from model import Model
+from model import load_pretrained
 import image_processing as imp
 
 
@@ -12,16 +13,18 @@ def get_argparse():
         necessary arguments for building the model.
         """
     parser = argparse.ArgumentParser()
+    parser.add_argument('dataset', type=str)
     parser.add_argument(
         "--save_dir",
         "-saved",
         dest="cpoint_dir",
         action="store",
         help="save model checkpoints to desired directory",
-        type=str,
+        type=str
     )
     parser.add_argument(
-        "--gpu", action="store_true", default=False, help="set gpu on/off, default off"
+        "--gpu", action="store_true", default=False,
+        help="set gpu on/off, default off"
     )
     parser.add_argument(
         "--hidden_units",
@@ -29,11 +32,17 @@ def get_argparse():
         dest="hidden_sizes",
         action="append",
         help="list of hidden unit with sizes",
-        type=int,
+        type=int
     )
-    parser.add_argument("--epochs", type=int, action="store", help="number of epochs")
     parser.add_argument(
-        "--learning_rate", type=float, action="store", dest="lr", help="learning rate"
+        "--epochs",
+        type=int,
+        action="store",
+        help="number of epochs"
+    )
+    parser.add_argument(
+        "--learning_rate", type=float, action="store", dest="lr",
+        help="learning rate"
     )
     parser.add_argument(
         "--arch",
@@ -53,7 +62,7 @@ def get_argparse():
     return arguments
 
 
-def validation(model, dataloader, criterion, device):
+def validation(model, dataloaders, criterion, device):
     """validate the model on validatio set using the same criterion with
     training the model. Return validation loss and validation accuracy
 
@@ -75,13 +84,14 @@ def validation(model, dataloader, criterion, device):
     validation_loss = 0
     accuracy = 0
 
-    for images, labels in dataloader:
-        images, labels = images.to(device), labels.to(device)
-        output = model.forward(images)
-        validation_loss += criterion(output, labels).item()
-        ps = torch.exp(output)
-        is_equal = labels.data == ps.max(dim=1)[1]
-        accuracy += is_equal.type(torch.FloatTensor).mean()
+    with torch.no_grad():
+        for images, labels in dataloaders:
+            images, labels = images.to(device), labels.to(device)
+            output = model.forward(images)
+            validation_loss += criterion(output, labels).item()
+            ps = torch.exp(output)
+            is_equal = labels.data == ps.max(dim=1)[1]
+            accuracy += is_equal.type(torch.FloatTensor).mean()
 
     return validation_loss, accuracy
 
@@ -90,8 +100,8 @@ def deep_learning(
     model,
     criterion,
     optimizer,
-    trainloader=dataloaders["train"],
-    validloader=dataloaders["valid"],
+    trainloader,
+    validloader,
     epochs=5,
     print_every=40,
     device="cpu",
@@ -119,7 +129,7 @@ def deep_learning(
         model.train()
         for images, labels in trainloader:
             steps += 1
-            images, labels = images.to(device), images.to(device)
+            images, labels = images.to(device), labels.to(device)
 
             # forward pass
             output = model.forward(images)
@@ -143,11 +153,10 @@ def deep_learning(
                     "Epoch: {}/{}..".format(e + 1, epochs),
                     "Training loss: {:.3f}".format(epoch_loss / printed),
                     "Validation loss: {:.3f}".format(
-                        valid_loss / len(validloader),
-                        "Validation accuracy: {:.3f}".format(
-                            valid_accuracy / len(validloader)
-                        ),
-                    ),
+                        valid_loss / len(validloader)),
+                    "Validation accuracy: {:.3f}".format(
+                        valid_accuracy / len(validloader)
+                    )
                 )
 
                 epoch_loss = 0
@@ -155,16 +164,29 @@ def deep_learning(
                 model.train()
 
 
-def save_model(model, save_dir):
+def save_model(model, epochs, optimizer, save_dir):
     """Save the trained model in desired directory based on user input directory.
 
     parameters
     ----------
     model: trained model to be saved
+    state_dict: model.state_dict()
+    epochs: int. Number of epochs
+    optimizer: torch.optim. Optimizer
     save_dir: string. Directory where model is saved
     """
-    # TODO
-    pass
+    checkpoint = {
+        'epoch': epochs,
+        'model': model,
+        'class_to_idx': model.class_to_idx,
+        'state_dict': model.state_dict(),
+        'optim_state': optimizer.state_dict()
+    }
+    filename = "model.pth"
+    savedir = os.path.join(save_dir, filename)
+    print("saving the model..")
+    torch.save(checkpoint, savedir)
+    print("[DONE] Saved!")
 
 
 # TODO:
@@ -172,22 +194,38 @@ def save_model(model, save_dir):
 #       (define directly in model.py)
 # 2. function deep_learning to train the model (v)
 # 3. function validatation to validate the model used in deep_learning
-#    function
+#    function (v)
 # 4. function save_model to save the model to desired directory
 
 if __name__ == "__main__":
     # get arguments input from command line
     argument = get_argparse()
     # load image
-    image_dataset, dataloaders = imp.process_data(sys.argv[1])
+    print('Creating data loaders..')
+    image_dataset, dataloaders = imp.process_data(argument.dataset)
     # instantiate the model with user input architecture
-    model = Model(argument.arch)
+    print('Loading pre-trained network..')
+    model = load_pretrained(
+        argument.arch, argument.hidden_sizes, 102, drop_p=0.6
+    )
+    print('[DONE]')
+    print('Model overview:')
+    print(model)
+    model.class_to_idx = image_dataset['train'].class_to_idx
     # define criterion and optimizer
+    print('Define criterion and optimizer..')
     criterion = nn.NLLLoss()
-    optimizer = optim.Adam(model.classifier.parameters(), lr=argument.learning_rate)
+    optimizer = optim.Adam(
+        model.classifier.parameters(),
+        lr=argument.lr
+    )
+    print('[DONE]')
     # train the model
+    print('\n\nTraining the network..')
     deep_learning(
-        model, criterion, optimizer, epochs=argument.epochs, device=argument.with_gpu
+        model, criterion, optimizer, epochs=argument.epochs,
+        device=argument.with_gpu, trainloader=dataloaders['train'],
+        validloader=dataloaders['valid']
     )
     # save the model
-    save_model(model, save_dir=argument.cpoint_dir)
+    save_model(model, argument.epochs, optimizer, save_dir=argument.cpoint_dir)
