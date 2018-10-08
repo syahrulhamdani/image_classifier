@@ -11,7 +11,7 @@ import argparse
 
 class Classifier(nn.Module):
     """Define new classifier."""
-    def __init__(self, hidden_sizes, output_size, drop_p=0.5):
+    def __init__(self, input_size, hidden_sizes, output_size, drop_p=0.5):
         """Initialize a new classifier to be attached to pretrained models.
 
         parameters
@@ -21,7 +21,9 @@ class Classifier(nn.Module):
         output_size: int. Sizes of the output layer
         """
         super().__init__()
-        self.hidden_layers = nn.ModuleList([nn.Linear(25088, hidden_sizes[0])])
+        self.hidden_layers = nn.ModuleList([nn.Linear(
+            input_size, hidden_sizes[0]
+        )])
         layers = zip(hidden_sizes[:-1], hidden_sizes[1:])
         self.hidden_layers.extend([nn.Linear(h1, h2) for h1, h2 in layers])
         self.output = nn.Linear(hidden_sizes[-1], output_size)
@@ -42,7 +44,8 @@ def load_pretrained(arch, hidden_sizes, output_size, drop_p=0.5):
     model = models.__dict__[arch](pretrained=True)
     for param in model.parameters():
         param.requires_grad = False
-    new_classifier = Classifier(hidden_sizes, output_size, drop_p)
+    input_size = model.classifier[0].in_features
+    new_classifier = Classifier(input_size, hidden_sizes, output_size, drop_p)
     model.classifier = new_classifier
 
     return model
