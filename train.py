@@ -54,7 +54,7 @@ def get_argparse():
     arguments = parser.parse_args()
 
     # condition for gpu
-    if arguments.gpu:
+    if arguments.gpu and torch.cuda.is_available():
         arguments.with_gpu = "cuda"
     else:
         arguments.with_gpu = "cpu"
