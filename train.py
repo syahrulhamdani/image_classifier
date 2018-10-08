@@ -190,14 +190,6 @@ def save_model(model, epochs, optimizer, save_dir):
     print("[DONE] Saved!")
 
 
-# TODO:
-# 1. function load_pretrained with classifier and pretrained model name
-#       (define directly in model.py)
-# 2. function deep_learning to train the model (v)
-# 3. function validatation to validate the model used in deep_learning
-#    function (v)
-# 4. function save_model to save the model to desired directory
-
 if __name__ == "__main__":
     # get arguments input from command line
     argument = get_argparse()
