@@ -30,7 +30,7 @@ def get_argument():
     )
     argument = parser.parse_args()
 
-    if argument.gpu:
+    if argument.gpu and torch.cuda.is_available():
         argument.with_gpu = 'cuda'
     else:
         argument.with_gpu = 'cpu'
@@ -63,18 +63,18 @@ def predict(model, image_path, top_k=5, cat_class=None, device='cpu'):
         image = torch.from_numpy(imp.process_image(image_path))
         output = model(image.type(torch.float32).to(device).unsqueeze_(0))
         ps = torch.exp(output)
-    prob = ps.topk(topk_k)[0].cpu().numpy()
+    prob = ps.topk(top_k)[0].cpu().numpy()
     idx = ps.topk(top_k)[1].cpu().numpy()
     class_name = []
     for key, value in model.class_to_idx.items():
         if value in idx[0]:
             class_name.append(key)
     if cat_class is not None:
-        with open('cat_to_name.json', 'r') as f:
+        with open(cat_class, 'r') as f:
             cat_to_name = json.load(f)
         flower_name = cat_to_name[class_name[0]]
 
-    return class_name, prob[0][0]
+    return flower_name, prob[0][0]
 
 
 if __name__ == "__main__":
