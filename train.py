@@ -180,6 +180,7 @@ def save_model(model, epochs, optimizer, save_dir):
         'model': model,
         'class_to_idx': model.class_to_idx,
         'state_dict': model.state_dict(),
+        'optim': optimizer,
         'optim_state': optimizer.state_dict()
     }
     filename = "model.pth"
