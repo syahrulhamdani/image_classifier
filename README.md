@@ -19,7 +19,16 @@ The classifier architecture used here is 3 hidden layers with units for each of 
 
 ## Getting Started
 
+These instruction show what requirements that need to be installed and how to start or inferencing.
+
 ### Requirements
+
+To be able to use this repository, you need to have:
+
+1. PyTorch
+2. Pillow
+3. Numpy
+4. Matplotlib (if you want to visualize the image)
 
 ### Installation
 
