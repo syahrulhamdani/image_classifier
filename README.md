@@ -30,16 +30,8 @@ To be able to use this repository, you need to have:
 3. Numpy
 4. Matplotlib (if you want to visualize the image)
 
-### Installation
+Also, you must have downloaded the flowers dataset provided [here](http://www.robots.ox.ac.uk/~vgg/data/flowers/102/index.html). If you have downloaded the dataset, you need to make your dataset to match PyTorch data loader format.
 
 ### Usage
-
-To train the model, use:
-
-```bash
-python train.py path/to/dataset --save_dir path/to/save/model [--gpu] [-hunits] [--epochs] [--learning_rate] [--arch]
-```
-
-## Experiment Results
 
 ## References
