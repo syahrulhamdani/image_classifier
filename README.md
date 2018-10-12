@@ -25,7 +25,7 @@ These instruction show what requirements that need to be installed and how to st
 
 To be able to use this repository, you need to have:
 
-1. PyTorch
+1. PyTorch (torch and torchvision)
 2. Pillow
 3. Numpy
 4. Matplotlib (if you want to visualize the image)
@@ -35,33 +35,22 @@ Also, you must have downloaded the flowers dataset provided [here](http://www.ro
 ### Usage
 
 - First, make sure you have the dataset in a proper directory structure
-- You can create and train your model using `train.py` with some optional arguments, for example:
+- There are optional arguments that can be passed as user input: `--gpu`,
+  `-hunits`, `--epochs`, `--learning_rate`, `--arch`, and `--save_dir`.
+
+    - `--save_dir` pass directory where you want to save the trained model,
+    - `--gpu` pass a boolean whether activate the gpu or not,
+    - `--hidden_units` or `-hunits` pass a list of hidden unit sizes to be the classifier of the model,
+    - `--learning_rate` needs you to pass the learning rate, and
+    - `--arch` is your choice of pretrained model architecture given in the `torchvision.models`
+
+- `dataset` is required as positional argument as dataset directory for training the model.
+- You can create and train your model using `train.py` with some optional arguments above, for example:
 
 ```bash
-python train.py flowers --arch 'vgg16' -hunits 4096 -hunits 2048 -hunits 512 --learning_rate 0.0003 -saved models
+python train.py flowers --arch 'vgg16' -hunits 4096 -hunits 2048 -hunits 512 --learning_rate 0.0003 -saved models --gpu
 ```
 
-- The optional arguments are:
-
-```bash
-usage: train.py [-h] [--save_dir CPOINT_DIR] [--gpu]
-                [--hidden_units HIDDEN_SIZES] [--epochs EPOCHS]
-                [--learning_rate LR] [--arch ARCH]
-                dataset
-
-positional arguments:
-  dataset
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --save_dir CPOINT_DIR, -saved CPOINT_DIR
-                        save model checkpoints to desired directory
-  --gpu                 set gpu on/off, default off
-  --hidden_units HIDDEN_SIZES, -hunits HIDDEN_SIZES
-                        list of hidden unit with sizes
-  --epochs EPOCHS       number of epochs
-  --learning_rate LR    learning rate
-  --arch ARCH           architecture of pretrained model to be loaded
-```
+If you run the above command, you will get a pretrained model of `vgg16` with self-defined classifier with hidden units `[4096, 2048, 512]` that will revise predefined classifier in the pretrained model, learning rate `0.0003`, train the network with gpu (the program will check the availability first), and save the trained model in folder named `models`.
 
 ## References
