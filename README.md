@@ -10,12 +10,12 @@ The classifier architecture used here is 3 hidden layers with units for each of 
 
 ## Table of Contents
 
-1. [Getting Started](/##getting-started)
-    1. [Requirements](/###requirements)
-    2. [Installation](/###installation)
-    3. [Usage](/###usage)
-2. [Experiment Results](/##experiment-results)
-3. [References](/##references)
+1. [Getting Started](https://github.com/syahrulhamdani/image_classifier#getting-started)
+    1. [Requirements](https://github.com/syahrulhamdani/image_classifier#requirements)
+    2. [Installation](https://github.com/syahrulhamdani/image_classifier#installation)
+    3. [Usage](https://github.com/syahrulhamdani/image_classifier#usage)
+2. [Experiment Results](https://github.com/syahrulhamdani/image_classifier#getting-startedexperiment-results)
+3. [References](https://github.com/syahrulhamdani/image_classifier#getting-startedreferences)
 
 ## Getting Started
 
