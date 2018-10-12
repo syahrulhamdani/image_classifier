@@ -10,12 +10,12 @@ The classifier architecture used here is 3 hidden layers with units for each of 
 
 ## Table of Contents
 
-1. [Getting Started](##getting-started)
-    1. [Requirements](###requirements)
-    2. [Installation](###installation)
-    3. [Usage](###usage)
-2. [Experiment Results](##experiment-results)
-3. [References](##references)
+1. [Getting Started](/##getting-started)
+    1. [Requirements](/###requirements)
+    2. [Installation](/###installation)
+    3. [Usage](/###usage)
+2. [Experiment Results](/##experiment-results)
+3. [References](/##references)
 
 ## Getting Started
 
@@ -33,5 +33,35 @@ To be able to use this repository, you need to have:
 Also, you must have downloaded the flowers dataset provided [here](http://www.robots.ox.ac.uk/~vgg/data/flowers/102/index.html). If you have downloaded the dataset, you need to make your dataset to match PyTorch data loader format.
 
 ### Usage
+
+- First, make sure you have the dataset in a proper directory structure
+- You can create and train your model using `train.py` with some optional arguments, for example:
+
+```bash
+python train.py flowers --arch 'vgg16' -hunits 4096 -hunits 2048 -hunits 512 --learning_rate 0.0003 -saved models
+```
+
+- The optional arguments are:
+
+```bash
+usage: train.py [-h] [--save_dir CPOINT_DIR] [--gpu]
+                [--hidden_units HIDDEN_SIZES] [--epochs EPOCHS]
+                [--learning_rate LR] [--arch ARCH]
+                dataset
+
+positional arguments:
+  dataset
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --save_dir CPOINT_DIR, -saved CPOINT_DIR
+                        save model checkpoints to desired directory
+  --gpu                 set gpu on/off, default off
+  --hidden_units HIDDEN_SIZES, -hunits HIDDEN_SIZES
+                        list of hidden unit with sizes
+  --epochs EPOCHS       number of epochs
+  --learning_rate LR    learning rate
+  --arch ARCH           architecture of pretrained model to be loaded
+```
 
 ## References
